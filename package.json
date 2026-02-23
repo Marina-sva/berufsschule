@@ -4,10 +4,8 @@
   "description": "",
   "main": "tik-tak-toe.js",
   "scripts": {
-    "scripts": {
-      "test": "jest",
-      "build": "echo build step hier"
-    }
+    "test": "jest",
+    "build": "echo build step hier"
   },
   "repository": {
     "type": "git",
