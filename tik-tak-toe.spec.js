@@ -1,3 +1,5 @@
+import { describe, it, expect, beforeEach, vi } from 'vitest';
+
 const { JSDOM } = require('jsdom');
 const dom = new JSDOM(`<!DOCTYPE html>
 <html lang="de">
@@ -22,7 +24,7 @@ global.HTMLElement = dom.window.HTMLElement;
 global.Element = dom.window.Element;
 global.Node = dom.window.Node;
 
-const game = require('../src/tik-tak-toe.js');
+const game = require('./tik-tak-toe.js');
 const X = game.cross;
 const O = game.circle;
 const emptyBoard = Array(9).fill('');
@@ -85,56 +87,56 @@ describe('findWinningMove', function () {
 
 describe('placeRandomCircle', function () {
     it('returns same board when no empty cells exist', function () {
-        const spy = spyOn(game, 'findEmptyCells').and.returnValue([]);
+        const spy = vi.spyOn(game, 'findEmptyCells').mockReturnValue([]);
         const result = game.placeRandomCircle(fullBoard);
         expect(result).toEqual(fullBoard);
-        spy.and.callThrough();
+        spy.mockRestore();
     });
 
     it('blocks cross winning move', function () {
-        const spy1 = spyOn(game, 'findEmptyCells').and.returnValue([2,3,5]);
-        const spy2 = spyOn(game, 'findWinningMove').and.callFake((board, player) =>
-            player === X ? 2 : null
-        );
+        const spy1 = vi.spyOn(game, 'findEmptyCells').mockReturnValue([2, 3, 5]);
+        const spy2 = vi.spyOn(game, 'findWinningMove').mockImplementation((board, player) => {
+            return player === X ? 2 : null;
+        });
 
         const board = [X,X,'','','','','','',''];
         const result = game.placeRandomCircle(board);
         expect(result[2]).toBe(O);
 
-        spy1.and.callThrough();
-        spy2.and.callThrough();
+        spy1.mockRestore();
+        spy2.mockRestore();
     });
 
     it('places circle on random empty cell', function () {
-        const spy1 = spyOn(game, 'findEmptyCells').and.returnValue([0,1,2]);
-        const spy2 = spyOn(game, 'findWinningMove').and.returnValue(null);
-        spyOn(Math, 'random').and.returnValue(0);
+        const spy1 = vi.spyOn(game, 'findEmptyCells').mockReturnValue([0,1,2]);
+        const spy2 = vi.spyOn(game, 'findWinningMove').mockReturnValue(null);
+        vi.spyOn(Math, 'random').mockReturnValue(0);
 
         const result = game.placeRandomCircle(emptyBoard);
         expect(result[0]).toBe(O);
 
-        spy1.and.callThrough();
-        spy2.and.callThrough();
+        spy1.mockRestore();
+        spy2.mockRestore()
     });
 });
 
 describe('checkWin', function () {
     it('returns true for winning board', function () {
-        expect(game.checkWin(playerWinBoard, X)).toBeTrue();
+        expect(game.checkWin(playerWinBoard, X)).toBeTruthy();
     });
 
     it('returns false for non-winning board', function () {
-        expect(game.checkWin(drawBoard, X)).toBeFalse();
+        expect(game.checkWin(drawBoard, X)).toBeFalsy();
     });
 });
 
 describe('checkDraw', function () {
     it('returns false when board is not full', function () {
-        expect(game.checkDraw(emptyBoard)).toBeFalse();
+        expect(game.checkDraw(emptyBoard)).toBeFalsy();
     });
 
     it('returns true when board is full', function () {
-        expect(game.checkDraw(drawBoard)).toBeTrue();
+        expect(game.checkDraw(drawBoard)).toBeTruthy();
     });
 });
 
@@ -167,11 +169,11 @@ describe('DOM Logic', () => {
             game.showMessage('Test');
             const msg = document.getElementById('message');
             expect(msg.textContent).toBe('Test');
-            expect(msg.classList.contains('show')).toBeTrue();
+            expect(msg.classList.contains('show')).toBeTruthy();
 
             game.clearMessage();
             expect(msg.textContent).toBe('');
-            expect(msg.classList.contains('show')).toBeFalse();
+            expect(msg.classList.contains('show')).toBeFalsy();
         });
     });
 
@@ -189,18 +191,18 @@ describe('DOM Logic', () => {
     describe('finishGame', () => {
         it('sets win state correctly', () => {
             game.finishGame('player');
-            expect(document.body.classList.contains('win')).toBeTrue();
+            expect(document.body.classList.contains('win')).toBeTruthy();
             expect(game.board).toBeDefined();
         });
 
         it('sets lose state correctly', () => {
             game.finishGame('computer');
-            expect(document.body.classList.contains('lose')).toBeTrue();
+            expect(document.body.classList.contains('lose')).toBeTruthy();
         });
 
         it('sets draw state correctly', () => {
             game.finishGame('draw');
-            expect(document.body.classList.contains('draw')).toBeTrue();
+            expect(document.body.classList.contains('draw')).toBeTruthy();
         });
     });
 });
