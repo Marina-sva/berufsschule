@@ -1,0 +1,11 @@
+# Node dependencies
+node_modules/
+
+# IDE settings
+.idea/
+
+# Optional: lock files
+package-lock.json
+
+# Optional: OS files
+.DS_Store
